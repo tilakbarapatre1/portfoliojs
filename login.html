@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Visitor Telemetry & Audit Logs — Tilak Barapatre</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23E05638'/><text x='50%' y='65%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='48' fill='white'>TB</text></svg>">
+
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    /* Specific Login & Admin Dashboard Styles */
+    .auth-page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .auth-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: 28px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 20px 50px -10px rgba(224, 86, 56, 0.12), 0 4px 16px rgba(0, 0, 0, 0.03);
+      position: relative;
+      text-align: center;
+    }
+
+    .auth-logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: var(--accent-coral-light);
+      color: var(--accent-coral);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 20px -4px rgba(224, 86, 56, 0.25);
+    }
+
+    .auth-title {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.025em;
+    }
+
+    .auth-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    .auth-form-group {
+      text-align: left;
+      margin-bottom: 1.25rem;
+    }
+
+    .auth-label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.45rem;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 0.85rem 1.15rem;
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--text-main);
+      background: #FAF7F2;
+      transition: all var(--transition-fast);
+      outline: none;
+    }
+
+    .auth-input:focus {
+      border-color: var(--accent-coral);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(224, 86, 56, 0.15);
+    }
+
+    .auth-error-msg {
+      color: #DC2626;
+      font-size: 0.8125rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .btn-login-submit {
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: var(--accent-coral);
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-coral-button);
+      transition: all var(--transition-fast);
+      margin-top: 0.5rem;
+    }
+
+    .btn-login-submit:hover {
+      background: var(--accent-coral-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-demo-quick {
+      width: 100%;
+      padding: 0.75rem 1.25rem;
+      background: var(--bg-tertiary);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-medium);
+      transition: all var(--transition-fast);
+      margin-top: 0.85rem;
+    }
+
+    .btn-demo-quick:hover {
+      background: #FFFFFF;
+      border-color: var(--accent-coral);
+      color: var(--accent-coral);
+    }
+
+    .auth-back-link {
+      display: inline-block;
+      margin-top: 1.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .auth-back-link:hover {
+      color: var(--accent-coral);
+    }
+
+    /* ----------------------------------------------------
+       DASHBOARD STYLES (When Authenticated)
+       ---------------------------------------------------- */
+    #dashboard-view {
+      display: none;
+      width: 100%;
+      max-width: 1240px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem 1.5rem;
+    }
+
+    .dash-navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: 20px;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-subtle);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .dash-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--text-main);
+    }
+
+    .dash-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .kpi-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .kpi-value {
+      font-family: var(--font-display);
+      font-size: 2.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .kpi-sub {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    /* Toolbar */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .search-input-wrap {
+      flex: 1;
+      max-width: 360px;
+      position: relative;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-full);
+      background: #FFFFFF;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent-coral);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tool-btn {
+      padding: 0.55rem 1.15rem;
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all var(--transition-fast);
+    }
+
+    .tool-btn:hover {
+      border-color: var(--accent-coral);
+      color: var(--accent-coral);
+    }
+
+    .tool-btn.primary {
+      background: var(--accent-coral);
+      border-color: var(--accent-coral);
+      color: #FFFFFF;
+    }
+
+    .tool-btn.primary:hover {
+      background: var(--accent-coral-hover);
+    }
+
+    /* Data Table Card */
+    .table-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .telemetry-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    .telemetry-table th {
+      background: #FAF7F2;
+      padding: 1rem 1.25rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-medium);
+      white-space: nowrap;
+    }
+
+    .telemetry-table td {
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid #F3EFE8;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    .telemetry-table tr:hover td {
+      background: #FCFAF7;
+    }
+
+    .ip-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      background: var(--bg-tertiary);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .ip-badge:hover {
+      background: var(--accent-coral-light);
+      color: var(--accent-coral);
+    }
+
+    .location-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .network-cell {
+      font-family: var(--font-mono);
+      font-size: 0.775rem;
+      color: var(--text-secondary);
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .device-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .status-pill-online {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.6rem;
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .empty-state-box {
+      text-align: center;
+      padding: 3.5rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-state-title {
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .empty-state-desc {
+      font-size: 0.875rem;
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       VIEW 1: ADMIN LOGIN SCREEN
+       ========================================================================== -->
+  <div class="auth-page-wrapper" id="login-view">
+    <div class="auth-card">
+      <div class="auth-logo-badge">TB</div>
+      
+      <h1 class="auth-title">Telemetry &amp; Audit Logs</h1>
+      <p class="auth-subtitle">
+        Sign in to view verified real-world visitor analytics, IP addresses, ISP networks, and geolocation telemetry.
+      </p>
+
+      <form id="login-form">
+        <div class="auth-form-group">
+          <label class="auth-label" for="username">Username</label>
+          <input type="text" id="username" class="auth-input" value="admin" required autocomplete="username">
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="password">Password</label>
+          <input type="password" id="password" class="auth-input" value="admin123" required autocomplete="current-password">
+        </div>
+
+        <div class="auth-error-msg" id="auth-error">
+          Invalid credentials. Use demo password (admin / admin123).
+        </div>
+
+        <button type="submit" class="btn-login-submit">
+          Access Analytics Dashboard →
+        </button>
+
+        <button type="button" class="btn-demo-quick" id="btn-quick-login">
+          ⚡ One-Click Demo Access
+        </button>
+      </form>
+
+      <a href="index.html" class="auth-back-link">← Return to Portfolio</a>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       VIEW 2: REAL VISITOR TELEMETRY DASHBOARD (AUTHENTICATED)
+       ========================================================================== -->
+  <div id="dashboard-view">
+    
+    <!-- Top Bar -->
+    <header class="dash-navbar">
+      <div class="dash-brand">
+        <span style="color: var(--accent-coral);">TB.</span>
+        <span>Real-Time Visitor Telemetry</span>
+        <span class="status-pill-online" style="margin-left: 0.5rem;">● Live Active (Zero Dummy Data)</span>
+      </div>
+
+      <div class="dash-nav-actions">
+        <a href="index.html" class="tool-btn">
+          <span>← Back to Portfolio</span>
+        </a>
+        <button class="tool-btn" id="btn-logout" style="border-color: #E5E0D8;">
+          <span>🚪 Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Metrics Cards (Genuine Data Only) -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Verified Page Views</div>
+        <div class="kpi-value" id="kpi-views">0</div>
+        <div class="kpi-sub" style="color: #10B981;">↑ Real global visitor counter</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">Unique Real IPs</div>
+        <div class="kpi-value" id="kpi-unique-ips">0</div>
+        <div class="kpi-sub">Verified client machines</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">Top Detected ISP / Network</div>
+        <div class="kpi-value" style="font-size: 1.25rem; padding-top: 0.4rem;" id="kpi-top-network">—</div>
+        <div class="kpi-sub">Real broadband traffic</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">Top Country Traffic</div>
+        <div class="kpi-value" style="font-size: 1.45rem; padding-top: 0.35rem;" id="kpi-top-geo">—</div>
+        <div class="kpi-sub">Verified geolocation</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">Mobile vs Desktop</div>
+        <div class="kpi-value" id="kpi-mobile-ratio">0%</div>
+        <div class="kpi-sub">Real client viewport share</div>
+      </div>
+    </div>
+
+    <!-- Toolbar & Filter Row -->
+    <div class="table-toolbar">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="log-search-input" class="search-box" placeholder="Filter real logs by IP, City, Network, Browser...">
+      </div>
+
+      <div class="toolbar-actions">
+        <button class="tool-btn primary" id="btn-refresh-real" title="Refresh real-time telemetry from network">
+          <span>🔄 Refresh Live Logs</span>
+        </button>
+        <button class="tool-btn" id="btn-export-csv" title="Download real audit logs in CSV format">
+          <span>📥 Export CSV</span>
+        </button>
+        <button class="tool-btn" id="btn-clear-logs" title="Clear recorded audit logs" style="color: #DC2626;">
+          <span>🗑️ Clear Logs</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Telemetry Data Table Card -->
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="telemetry-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Timestamp</th>
+              <th>Real IP Address</th>
+              <th>Verified Location</th>
+              <th>Network / ISP &amp; ASN</th>
+              <th>Device &amp; OS</th>
+              <th>Target Path</th>
+            </tr>
+          </thead>
+          <tbody id="telemetry-tbody">
+            <!-- Populated with 100% genuine real visitor data only -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick Copy Toast -->
+  <div class="copy-toast" id="copy-toast" role="status" aria-live="polite">
+    ✓ Copied to clipboard!
+  </div>
+
+  <!-- Telemetry & Analytics Scripts -->
+  <script src="js/analytics.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginView = document.getElementById('login-view');
+      const dashboardView = document.getElementById('dashboard-view');
+      const loginForm = document.getElementById('login-form');
+      const btnQuickLogin = document.getElementById('btn-quick-login');
+      const btnLogout = document.getElementById('btn-logout');
+      const authError = document.getElementById('auth-error');
+      
+      const searchInput = document.getElementById('log-search-input');
+      const tbody = document.getElementById('telemetry-tbody');
+      const btnRefresh = document.getElementById('btn-refresh-real');
+      const btnExport = document.getElementById('btn-export-csv');
+      const btnClear = document.getElementById('btn-clear-logs');
+      const toast = document.getElementById('copy-toast');
+
+      // Check session
+      if (sessionStorage.getItem('tb_admin_auth') === 'true') {
+        showDashboard();
+      }
+
+      // Login handler
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+
+        if (u === 'admin' && p === 'admin123') {
+          sessionStorage.setItem('tb_admin_auth', 'true');
+          showDashboard();
+        } else {
+          authError.style.display = 'block';
+        }
+      });
+
+      // Quick Demo Access
+      btnQuickLogin.addEventListener('click', () => {
+        sessionStorage.setItem('tb_admin_auth', 'true');
+        showDashboard();
+      });
+
+      // Logout handler
+      btnLogout.addEventListener('click', () => {
+        sessionStorage.removeItem('tb_admin_auth');
+        dashboardView.style.display = 'none';
+        loginView.style.display = 'flex';
+      });
+
+      function showDashboard() {
+        loginView.style.display = 'none';
+        dashboardView.style.display = 'block';
+        renderDashboard();
+      }
+
+      function renderDashboard() {
+        const analytics = window.PortfolioAnalytics;
+        if (!analytics) return;
+
+        const stats = analytics.getRealStats();
+        
+        // Update KPIs with real data
+        document.getElementById('kpi-views').textContent = Number(stats.totalVisits).toLocaleString();
+        document.getElementById('kpi-unique-ips').textContent = stats.uniqueIps;
+        document.getElementById('kpi-top-network').textContent = stats.totalLogged > 0 ? stats.topNetwork.split('(')[0].trim() : 'Waiting for visits';
+        document.getElementById('kpi-top-geo').textContent = stats.totalLogged > 0 ? stats.topCountry : 'Waiting for visits';
+        document.getElementById('kpi-mobile-ratio').textContent = `${stats.mobileRatio}%`;
+
+        // Render Real Table Rows
+        renderTableRows(analytics.logs);
+      }
+
+      function renderTableRows(logs) {
+        tbody.innerHTML = '';
+
+        if (!logs || logs.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7">
+                <div class="empty-state-box">
+                  <div class="empty-state-icon">📡</div>
+                  <h4 class="empty-state-title">No visits recorded yet</h4>
+                  <p class="empty-state-desc">
+                    Telemetry is actively listening. When someone visits the portfolio (locally or on Vercel),
+                    their real IP, ISP network, and device telemetry will automatically appear here.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        logs.forEach(log => {
+          const tr = document.createElement('tr');
+          const timeFormatted = formatTime(log.timestamp);
+
+          tr.innerHTML = `
+            <td>
+              <span class="status-pill-online">
+                ● ${log.status === 'online' ? 'Active' : 'Logged'}
+              </span>
+            </td>
+            <td style="font-size: 0.8125rem; color: var(--text-muted); white-space: nowrap;">
+              ${timeFormatted}
+            </td>
+            <td>
+              <span class="ip-badge" onclick="copyText('${log.ip}')" title="Click to copy verified IP">
+                ${log.ip}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </span>
+            </td>
+            <td>
+              <div class="location-cell">
+                <span>${log.flag || '🌐'}</span>
+                <span>${log.city || 'Unknown'}, ${log.country || 'Region'}</span>
+              </div>
+            </td>
+            <td>
+              <div class="network-cell" title="${log.network}">
+                ${log.network || 'Broadband ISP'}
+              </div>
+            </td>
+            <td>
+              <div class="device-badge">
+                <span>${log.device === 'Mobile' ? '📱' : '💻'}</span>
+                <span>${log.os} • ${log.browser}</span>
+              </div>
+            </td>
+            <td>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-coral);">
+                ${log.path || '/'}
+              </span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function formatTime(isoString) {
+        try {
+          const d = new Date(isoString);
+          const now = new Date();
+          const diffMinutes = Math.floor((now - d) / 60000);
+          
+          if (diffMinutes < 1) return 'Just now';
+          if (diffMinutes < 60) return `${diffMinutes}m ago`;
+          if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}h ago`;
+          return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+          return isoString;
+        }
+      }
+
+      // Filter search
+      searchInput.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const logs = window.PortfolioAnalytics.logs.filter(l => {
+          return l.ip.toLowerCase().includes(q) ||
+                 l.city.toLowerCase().includes(q) ||
+                 l.country.toLowerCase().includes(q) ||
+                 l.network.toLowerCase().includes(q) ||
+                 l.os.toLowerCase().includes(q) ||
+                 l.browser.toLowerCase().includes(q);
+        });
+        renderTableRows(logs);
+      });
+
+      // Refresh real logs
+      btnRefresh.addEventListener('click', () => {
+        renderDashboard();
+        showToast('🔄 Real telemetry refreshed.');
+      });
+
+      // Export CSV
+      btnExport.addEventListener('click', () => {
+        const logs = window.PortfolioAnalytics.logs;
+        if (!logs || logs.length === 0) return alert('No real visitor logs to export yet.');
+
+        let csv = 'Timestamp,Real IP,City,Region,Country,Network ISP,Device,OS,Browser,Path,Referrer\n';
+        logs.forEach(l => {
+          csv += `"${l.timestamp}","${l.ip}","${l.city}","${l.region}","${l.country}","${l.network}","${l.device}","${l.os}","${l.browser}","${l.path}","${l.referrer}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tilak-real-visitor-logs-${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // Clear Logs
+      btnClear.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear real audit logs?')) {
+          window.PortfolioAnalytics.clearLogs();
+          renderDashboard();
+          showToast('✓ Logs cleared.');
+        }
+      });
+
+      window.copyText = function(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`✓ Copied IP: ${text}`);
+        });
+      };
+
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2400);
+      }
+    });
+  </script>
+
+</body>
+</html>
