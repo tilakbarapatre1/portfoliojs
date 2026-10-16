@@ -1,5 +1,9 @@
 // api/track.js
 // Vercel Serverless Function to track real visitor IP, network, geolocation and global views
+// Broadcasts to real-time live presence stream for multi-device dashboard synchronization
+
+const LIVE_SYNC_TOPIC = 'tb_portfolio_live_sessions_v1';
+const LIVE_SYNC_URL = `https://ntfy.sh/${LIVE_SYNC_TOPIC}`;
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -33,49 +37,75 @@ export default async function handler(req, res) {
     const path = body.path || '/';
     const referrer = body.referrer || req.headers['referer'] || 'Direct Visit';
     const isp = body.network || `${country} Network`;
+    const deviceId = body.deviceId || ('dev_' + Math.random().toString(36).substring(2, 9));
+    const sessionId = body.sessionId || ('sess_' + Math.random().toString(36).substring(2, 9));
+    const action = body.action || 'visit';
 
-    // 3. Cloud KV / Upstash Persistence (if user configures Vercel KV)
+    const realVisitor = {
+      id: 'real-' + Date.now().toString(36),
+      deviceId,
+      sessionId,
+      action,
+      ip: clientIp,
+      city,
+      region,
+      country,
+      flag: body.flag || (country === 'India' ? '🇮🇳' : '🌐'),
+      network: isp,
+      device: body.device || 'Desktop',
+      os: body.os || 'Unknown OS',
+      browser: body.browser || 'Unknown Browser',
+      path,
+      referrer,
+      timestamp: new Date().toISOString(),
+      status: body.status || 'online'
+    };
+
+    // 3. Broadcast to Real-Time Live Presence Stream (Syncs all active admin screens & devices)
+    try {
+      const liveCtrl = new AbortController();
+      const liveTimeout = setTimeout(() => liveCtrl.abort(), 2000);
+      await fetch(LIVE_SYNC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(realVisitor),
+        signal: liveCtrl.signal
+      });
+      clearTimeout(liveTimeout);
+    } catch (e) {
+      // Non-blocking broadcast fallback
+    }
+
+    // 4. Cloud KV / Upstash Persistence (if user configures Vercel KV)
     const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
     const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 
     let views = 0;
 
     if (kvUrl && kvToken) {
-      // Increment real views
-      const incrRes = await fetch(`${kvUrl}/incr/tb_real_portfolio_views`, {
-        headers: { Authorization: `Bearer ${kvToken}` }
-      });
-      const incrData = await incrRes.json();
-      views = incrData.result || 1;
+      try {
+        if (action === 'visit') {
+          // Increment real views
+          const incrRes = await fetch(`${kvUrl}/incr/tb_real_portfolio_views`, {
+            headers: { Authorization: `Bearer ${kvToken}` }
+          });
+          const incrData = await incrRes.json();
+          views = incrData.result || 1;
 
-      const realVisitor = {
-        id: 'real-' + Date.now().toString(36),
-        ip: clientIp,
-        city,
-        region,
-        country,
-        network: isp,
-        device: body.device || 'Desktop',
-        os: body.os || 'Unknown OS',
-        browser: body.browser || 'Unknown Browser',
-        path,
-        referrer,
-        timestamp: new Date().toISOString(),
-        status: 'online'
-      };
-
-      // Save real visitor log in Redis list
-      await fetch(`${kvUrl}/lpush/tb_real_visitor_logs`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${kvToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(realVisitor)
-      });
-      await fetch(`${kvUrl}/ltrim/tb_real_visitor_logs/0/99`, {
-        headers: { Authorization: `Bearer ${kvToken}` }
-      });
+          // Save real visitor log in Redis list
+          await fetch(`${kvUrl}/lpush/tb_real_visitor_logs`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${kvToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(realVisitor)
+          });
+          await fetch(`${kvUrl}/ltrim/tb_real_visitor_logs/0/99`, {
+            headers: { Authorization: `Bearer ${kvToken}` }
+          });
+        }
+      } catch (kvErr) {}
 
       return res.status(200).json({
         success: true,
@@ -85,7 +115,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 4. Fallback: Global counter service for verified persistent views without DB
+    // 5. Fallback: Global counter service for verified persistent views without DB
     try {
       const badgeRes = await fetch('https://visitor-badge.laobi.icu/badge?page_id=tilakbarapatre.portfolio', {
         headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -98,22 +128,6 @@ export default async function handler(req, res) {
         }
       }
     } catch (e) {}
-
-    const realVisitor = {
-      id: 'real-' + Date.now().toString(36),
-      ip: clientIp,
-      city,
-      region,
-      country,
-      network: isp,
-      device: body.device || 'Desktop',
-      os: body.os || 'Unknown OS',
-      browser: body.browser || 'Unknown Browser',
-      path,
-      referrer,
-      timestamp: new Date().toISOString(),
-      status: 'online'
-    };
 
     return res.status(200).json({
       success: true,

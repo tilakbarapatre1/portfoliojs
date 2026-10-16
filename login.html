@@ -164,16 +164,16 @@
     #dashboard-view {
       display: none;
       width: 100%;
-      max-width: 1240px;
+      max-width: 1260px;
       margin: 2rem auto;
-      padding: 0 1.5rem 4rem 1.5rem;
+      padding: 0 1.5rem 5rem 1.5rem;
     }
 
     .dash-navbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 1.5rem;
+      padding: 1.15rem 1.75rem;
       background: #FFFFFF;
       border: 1px solid var(--border-medium);
       border-radius: 20px;
@@ -197,12 +197,13 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
     /* KPI Grid */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1.25rem;
       margin-bottom: 2rem;
     }
@@ -213,6 +214,14 @@
       border-radius: 20px;
       padding: 1.5rem;
       box-shadow: var(--shadow-subtle);
+      transition: all var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card.highlight {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: linear-gradient(180deg, #FFFFFF 0%, #F5FBF8 100%);
     }
 
     .kpi-title {
@@ -222,6 +231,9 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .kpi-value {
@@ -229,13 +241,353 @@
       font-size: 2.15rem;
       font-weight: 800;
       color: var(--text-main);
-      line-height: 1;
+      line-height: 1.1;
     }
 
     .kpi-sub {
       font-size: 0.8125rem;
       color: var(--text-secondary);
       margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* ====================================================
+       REAL-TIME LIVE ACTIVE DEVICES PANEL
+       ==================================================== */
+    .live-panel-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: 24px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .live-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 1.5rem;
+    }
+
+    .live-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .live-radar-box {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(16, 185, 129, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .radar-pulse-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background: rgba(16, 185, 129, 0.35);
+      animation: radar-pulse 2s infinite ease-out;
+    }
+
+    @keyframes radar-pulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .radar-core-icon {
+      font-size: 1.25rem;
+      z-index: 2;
+    }
+
+    .live-panel-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .live-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.75rem;
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 700;
+    }
+
+    .live-panel-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    .live-header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .stream-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      background: #FAF7F2;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-full);
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .stream-status-pill.connected .status-dot {
+      background: #10B981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+
+    .stream-status-pill .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #D97706;
+    }
+
+    /* Live Devices Grid */
+    .live-devices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .live-device-card {
+      background: #FCFAF7;
+      border: 1.5px solid var(--border-medium);
+      border-radius: 20px;
+      padding: 1.4rem;
+      transition: all var(--transition-fast);
+      position: relative;
+      animation: cardAppear 0.35s ease-out;
+    }
+
+    @keyframes cardAppear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .live-device-card:hover {
+      border-color: var(--accent-coral-border);
+      background: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -4px rgba(224, 86, 56, 0.08);
+    }
+
+    .live-device-card.this-device {
+      border-color: rgba(224, 86, 56, 0.35);
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFF9F6 100%);
+    }
+
+    .device-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .device-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+      flex-shrink: 0;
+    }
+
+    .this-device .device-icon-box {
+      background: var(--accent-coral-light);
+      border-color: var(--accent-coral-border);
+    }
+
+    .device-title-wrap {
+      flex: 1;
+    }
+
+    .device-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag-this-device {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      background: var(--accent-coral);
+      color: #FFFFFF;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-remote-visitor {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .device-specs {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    .device-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-full);
+      font-size: 0.725rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .device-status-pill.online {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+    }
+
+    .device-status-pill.online .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      animation: dotPulse 1.6s infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .device-status-pill.idle {
+      background: rgba(217, 119, 6, 0.12);
+      color: #D97706;
+    }
+
+    .device-status-pill.offline {
+      background: rgba(156, 163, 175, 0.15);
+      color: #6B7280;
+    }
+
+    .device-details-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 0.9rem;
+    }
+
+    .device-detail-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .detail-val {
+      font-weight: 600;
+      color: var(--text-main);
+      text-align: right;
+    }
+
+    .detail-val.path {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-coral);
+      background: var(--accent-coral-light);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    .detail-val.ip {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    /* Multi-Device Testing Tip Banner */
+    .multi-device-banner {
+      background: #FFFDF9;
+      border: 1px dashed var(--accent-coral-border);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .banner-text-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .banner-icon {
+      font-size: 1.75rem;
+    }
+
+    .banner-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .banner-desc {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
     }
 
     /* Toolbar */
@@ -297,6 +649,7 @@
       align-items: center;
       gap: 0.4rem;
       transition: all var(--transition-fast);
+      cursor: pointer;
     }
 
     .tool-btn:hover {
@@ -352,6 +705,15 @@
 
     .telemetry-table tr:hover td {
       background: #FCFAF7;
+    }
+
+    .telemetry-table tr.flash-row td {
+      animation: rowFlash 1.5s ease-out;
+    }
+
+    @keyframes rowFlash {
+      0% { background: rgba(224, 86, 56, 0.18); }
+      100% { background: transparent; }
     }
 
     .ip-badge {
@@ -430,7 +792,7 @@
 
     .empty-state-desc {
       font-size: 0.875rem;
-      max-width: 420px;
+      max-width: 440px;
       margin: 0 auto;
       line-height: 1.5;
     }
@@ -447,7 +809,7 @@
       
       <h1 class="auth-title">Telemetry &amp; Audit Logs</h1>
       <p class="auth-subtitle">
-        Sign in to view verified real-world visitor analytics, IP addresses, ISP networks, and geolocation telemetry.
+        Sign in to view verified real-world visitor analytics, active live devices, IP addresses, ISP networks, and geolocation telemetry.
       </p>
 
       <form id="login-form">
@@ -488,10 +850,15 @@
       <div class="dash-brand">
         <span style="color: var(--accent-coral);">TB.</span>
         <span>Real-Time Visitor Telemetry</span>
-        <span class="status-pill-online" style="margin-left: 0.5rem;">● Live Active (Zero Dummy Data)</span>
+        <span class="status-pill-online" style="margin-left: 0.5rem;" id="nav-live-indicator">
+          <span class="pulse-dot"></span> Live Active Sync
+        </span>
       </div>
 
       <div class="dash-nav-actions">
+        <button class="tool-btn" id="btn-copy-site-link" title="Copy website link to test on mobile phone">
+          <span>📱 Open on Mobile</span>
+        </button>
         <a href="index.html" class="tool-btn">
           <span>← Back to Portfolio</span>
         </a>
@@ -503,6 +870,17 @@
 
     <!-- KPI Metrics Cards (Genuine Data Only) -->
     <div class="kpi-grid">
+      <div class="kpi-card highlight">
+        <div class="kpi-title">
+          <span>Live Devices Online</span>
+          <span>🟢</span>
+        </div>
+        <div class="kpi-value" id="kpi-live-devices">1</div>
+        <div class="kpi-sub" style="color: #059669;" id="kpi-live-sub">
+          ● 1 Desktop active now
+        </div>
+      </div>
+
       <div class="kpi-card">
         <div class="kpi-title">Verified Page Views</div>
         <div class="kpi-value" id="kpi-views">0</div>
@@ -516,23 +894,71 @@
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-title">Top Detected ISP / Network</div>
-        <div class="kpi-value" style="font-size: 1.25rem; padding-top: 0.4rem;" id="kpi-top-network">—</div>
+        <div class="kpi-title">Top Detected ISP</div>
+        <div class="kpi-value" style="font-size: 1.2rem; padding-top: 0.35rem;" id="kpi-top-network">—</div>
         <div class="kpi-sub">Real broadband traffic</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-title">Top Country Traffic</div>
-        <div class="kpi-value" style="font-size: 1.45rem; padding-top: 0.35rem;" id="kpi-top-geo">—</div>
-        <div class="kpi-sub">Verified geolocation</div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-title">Mobile vs Desktop</div>
         <div class="kpi-value" id="kpi-mobile-ratio">0%</div>
-        <div class="kpi-sub">Real client viewport share</div>
+        <div class="kpi-sub" id="kpi-mobile-sub">0 Mobile / 0 Desktop</div>
       </div>
     </div>
+
+    <!-- ======================================================================
+         REAL-TIME LIVE ACTIVE DEVICES & SESSIONS PANEL
+         ====================================================================== -->
+    <section class="live-panel-card">
+      <div class="live-panel-header">
+        <div class="live-header-left">
+          <div class="live-radar-box">
+            <div class="radar-pulse-ring"></div>
+            <div class="radar-core-icon">📡</div>
+          </div>
+          <div>
+            <div class="live-panel-title">
+              <span>Connected Live Devices</span>
+              <span class="live-count-badge" id="live-panel-badge">1 Active Now</span>
+            </div>
+            <p class="live-panel-subtitle">
+              Streaming real-time client presence, page viewports, and live network heartbeats across all connected devices
+            </p>
+          </div>
+        </div>
+
+        <div class="live-header-right">
+          <div class="stream-status-pill connected" id="stream-status-pill">
+            <span class="status-dot"></span>
+            <span id="stream-status-text">Live Stream Active</span>
+          </div>
+          <button class="tool-btn" id="btn-ping-devices" title="Broadcast a live heartbeat request to all active client tabs">
+            <span>⚡ Ping All Devices</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Devices Grid Container -->
+      <div class="live-devices-grid" id="live-devices-container">
+        <!-- Rendered dynamically in real time -->
+      </div>
+
+      <!-- Multi-Device Test Helper Banner -->
+      <div class="multi-device-banner" id="multi-device-banner">
+        <div class="banner-text-wrap">
+          <span class="banner-icon">📲</span>
+          <div>
+            <div class="banner-title">Test Multi-Device Live Sync</div>
+            <div class="banner-desc">
+              Open your portfolio on your mobile phone (or in Chrome/Edge Incognito) — it will immediately pop up above in real time with live heartbeats!
+            </div>
+          </div>
+        </div>
+        <button class="tool-btn primary" id="btn-copy-banner-link">
+          <span>📋 Copy Link to Open on Mobile</span>
+        </button>
+      </div>
+    </section>
 
     <!-- Toolbar & Filter Row -->
     <div class="table-toolbar">
@@ -543,13 +969,13 @@
 
       <div class="toolbar-actions">
         <button class="tool-btn primary" id="btn-refresh-real" title="Refresh real-time telemetry from network">
-          <span>🔄 Refresh Live Logs</span>
+          <span>🔄 Sync Remote Logs</span>
         </button>
         <button class="tool-btn" id="btn-export-csv" title="Download real audit logs in CSV format">
           <span>📥 Export CSV</span>
         </button>
         <button class="tool-btn" id="btn-clear-logs" title="Clear recorded audit logs" style="color: #DC2626;">
-          <span>🗑️ Clear Logs</span>
+          <span>🗑️ Clear Local Logs</span>
         </button>
       </div>
     </div>
@@ -570,7 +996,7 @@
             </tr>
           </thead>
           <tbody id="telemetry-tbody">
-            <!-- Populated with 100% genuine real visitor data only -->
+            <!-- Populated with genuine real visitor logs -->
           </tbody>
         </table>
       </div>
@@ -600,7 +1026,18 @@
       const btnRefresh = document.getElementById('btn-refresh-real');
       const btnExport = document.getElementById('btn-export-csv');
       const btnClear = document.getElementById('btn-clear-logs');
+      const btnPing = document.getElementById('btn-ping-devices');
+      const btnCopyLink = document.getElementById('btn-copy-site-link');
+      const btnCopyBanner = document.getElementById('btn-copy-banner-link');
       const toast = document.getElementById('copy-toast');
+      const devicesContainer = document.getElementById('live-devices-container');
+      const streamPill = document.getElementById('stream-status-pill');
+      const streamText = document.getElementById('stream-status-text');
+
+      // State Map of all active connected devices
+      // Key: deviceId, Value: device details object
+      const activeDevices = new Map();
+      let liveSubscribed = false;
 
       // Check session
       if (sessionStorage.getItem('tb_admin_auth') === 'true') {
@@ -637,27 +1074,287 @@
       function showDashboard() {
         loginView.style.display = 'none';
         dashboardView.style.display = 'block';
+
+        initCurrentAdminDevice();
+        initLiveSubscription();
         renderDashboard();
+
+        // Start live ticker every 1.5 seconds to refresh "Xs ago" and device status
+        setInterval(() => {
+          updateDeviceHeartbeatStates();
+        }, 1500);
+      }
+
+      // Register the current browser screen as an active admin session
+      function initCurrentAdminDevice() {
+        const analytics = window.PortfolioAnalytics;
+        if (!analytics) return;
+
+        const myId = analytics.deviceId;
+        const myInfo = analytics.parseClientDevice();
+
+        // Get local IP/network from latest log if available
+        const latestSelf = analytics.logs.find(l => l.deviceId === myId);
+
+        activeDevices.set(myId, {
+          deviceId: myId,
+          device: myInfo.device,
+          os: myInfo.os,
+          browser: myInfo.browser,
+          resolution: myInfo.resolution,
+          ip: latestSelf ? latestSelf.ip : 'Current Host',
+          city: latestSelf ? latestSelf.city : 'Local',
+          region: latestSelf ? latestSelf.region : '',
+          country: latestSelf ? latestSelf.country : 'India',
+          flag: latestSelf ? latestSelf.flag : '💻',
+          network: latestSelf ? latestSelf.network : 'Authenticated Admin Console',
+          path: '/login',
+          lastSeen: Date.now(),
+          status: 'online',
+          isAdmin: true,
+          isCurrentDevice: true
+        });
+
+        // Also fetch remote logs from serverless endpoint
+        analytics.fetchRemoteLogs().then(() => {
+          renderDashboard();
+        });
+      }
+
+      // Initialize real-time cross-device live subscription
+      function initLiveSubscription() {
+        if (liveSubscribed) return;
+        liveSubscribed = true;
+
+        const analytics = window.PortfolioAnalytics;
+        if (!analytics) return;
+
+        analytics.subscribeLive((event) => {
+          handleIncomingLiveEvent(event);
+        });
+      }
+
+      // Handle real-time stream messages (SSE, WebSockets, or BroadcastChannel)
+      function handleIncomingLiveEvent(event) {
+        if (!event || typeof event !== 'object') return;
+
+        // Stream connection state change
+        if (event.action === 'stream_status') {
+          if (event.status === 'connected') {
+            streamPill.className = 'stream-status-pill connected';
+            streamText.textContent = 'Live Stream Active';
+          } else {
+            streamPill.className = 'stream-status-pill';
+            streamText.textContent = 'Reconnecting...';
+          }
+          return;
+        }
+
+        const myId = window.PortfolioAnalytics ? window.PortfolioAnalytics.deviceId : null;
+        const devId = event.deviceId || (event.ip ? `${event.ip}-${event.device}-${event.os}` : null);
+        if (!devId) return;
+
+        const isCurrent = (devId === myId);
+
+        // When a device announces a visit or heartbeat
+        if (event.action === 'visit' || event.action === 'heartbeat' || event.action === 'state_change' || event.action === 'ping_reply') {
+          const isNewDevice = !activeDevices.has(devId) && !isCurrent;
+          const existing = activeDevices.get(devId) || {};
+
+          activeDevices.set(devId, {
+            ...existing,
+            ...event,
+            deviceId: devId,
+            isCurrentDevice: isCurrent,
+            lastSeen: Date.now(),
+            status: event.status || 'online'
+          });
+
+          // Add to visitor audit trail if visit
+          if (event.action === 'visit' && event.ip) {
+            const analytics = window.PortfolioAnalytics;
+            if (analytics) {
+              const alreadyHas = analytics.logs.some(l => l.id === event.id || (l.deviceId === event.deviceId && Math.abs(new Date(l.timestamp) - new Date(event.timestamp)) < 15000));
+              if (!alreadyHas) {
+                analytics.logs.unshift(event);
+                if (analytics.logs.length > 100) analytics.logs = analytics.logs.slice(0, 100);
+                analytics.saveRealLogs(analytics.logs);
+                analytics.totalViews++;
+                analytics.saveRealViews(analytics.totalViews);
+                renderTableRows(analytics.logs, event.id);
+              }
+            }
+          }
+
+          if (isNewDevice) {
+            showToast(`⚡ New ${event.device} connected from ${event.city || 'Visitor Location'} (${event.flag || '🌐'})!`);
+          }
+
+          renderLiveDeviceCards();
+          updateKPIs();
+        } else if (event.action === 'leave') {
+          const dev = activeDevices.get(devId);
+          if (dev) {
+            dev.status = 'offline';
+            dev.lastSeen = Date.now() - 40000;
+            renderLiveDeviceCards();
+            updateKPIs();
+          }
+        }
+      }
+
+      // Ticker to update time-ago and transition inactive devices
+      function updateDeviceHeartbeatStates() {
+        const now = Date.now();
+        let changed = false;
+
+        activeDevices.forEach((dev, id) => {
+          const elapsedSec = Math.round((now - dev.lastSeen) / 1000);
+
+          if (dev.isCurrentDevice) {
+            dev.lastSeen = now;
+            dev.status = 'online';
+            return;
+          }
+
+          if (elapsedSec < 35 && dev.status !== 'offline') {
+            if (dev.status !== 'online') { dev.status = 'online'; changed = true; }
+          } else if (elapsedSec >= 35 && elapsedSec < 120 && dev.status !== 'offline') {
+            if (dev.status !== 'idle') { dev.status = 'idle'; changed = true; }
+          } else if (elapsedSec >= 120) {
+            if (dev.status !== 'offline') { dev.status = 'offline'; changed = true; }
+            // Remove devices offline for > 10 minutes
+            if (elapsedSec > 600) {
+              activeDevices.delete(id);
+              changed = true;
+            }
+          }
+        });
+
+        renderLiveDeviceCards();
+        updateKPIs();
       }
 
       function renderDashboard() {
+        renderLiveDeviceCards();
+        updateKPIs();
+
+        const analytics = window.PortfolioAnalytics;
+        if (analytics) {
+          renderTableRows(analytics.logs);
+        }
+      }
+
+      function updateKPIs() {
         const analytics = window.PortfolioAnalytics;
         if (!analytics) return;
 
         const stats = analytics.getRealStats();
-        
-        // Update KPIs with real data
-        document.getElementById('kpi-views').textContent = Number(stats.totalVisits).toLocaleString();
-        document.getElementById('kpi-unique-ips').textContent = stats.uniqueIps;
-        document.getElementById('kpi-top-network').textContent = stats.totalLogged > 0 ? stats.topNetwork.split('(')[0].trim() : 'Waiting for visits';
-        document.getElementById('kpi-top-geo').textContent = stats.totalLogged > 0 ? stats.topCountry : 'Waiting for visits';
-        document.getElementById('kpi-mobile-ratio').textContent = `${stats.mobileRatio}%`;
 
-        // Render Real Table Rows
-        renderTableRows(analytics.logs);
+        // Calculate live devices online right now
+        let onlineCount = 0;
+        let onlineMobile = 0;
+        let onlineDesktop = 0;
+
+        activeDevices.forEach(dev => {
+          if (dev.status === 'online') {
+            onlineCount++;
+            if (dev.device === 'Mobile') onlineMobile++;
+            else onlineDesktop++;
+          }
+        });
+
+        // Update KPIs
+        document.getElementById('kpi-live-devices').textContent = onlineCount;
+        document.getElementById('kpi-live-sub').textContent = `● ${onlineDesktop} Desktop, ${onlineMobile} Mobile live`;
+        document.getElementById('live-panel-badge').textContent = `${onlineCount} Active Now`;
+
+        document.getElementById('kpi-views').textContent = Number(stats.totalVisits).toLocaleString();
+        document.getElementById('kpi-unique-ips').textContent = Math.max(stats.uniqueIps, activeDevices.size);
+        document.getElementById('kpi-top-network').textContent = stats.totalLogged > 0 ? stats.topNetwork.split('(')[0].trim() : 'Waiting for visits';
+        document.getElementById('kpi-mobile-ratio').textContent = `${stats.mobileRatio}%`;
+        document.getElementById('kpi-mobile-sub').textContent = `${onlineMobile} Mobile / ${onlineDesktop} Desktop live`;
       }
 
-      function renderTableRows(logs) {
+      function renderLiveDeviceCards() {
+        if (!devicesContainer) return;
+
+        const devices = Array.from(activeDevices.values());
+        // Sort: current device first, then by lastSeen desc
+        devices.sort((a, b) => {
+          if (a.isCurrentDevice) return -1;
+          if (b.isCurrentDevice) return 1;
+          return b.lastSeen - a.lastSeen;
+        });
+
+        devicesContainer.innerHTML = '';
+
+        devices.forEach(dev => {
+          const card = document.createElement('div');
+          card.className = `live-device-card ${dev.isCurrentDevice ? 'this-device' : ''}`;
+
+          const icon = dev.device === 'Mobile' ? '📱' : (dev.device === 'Tablet' ? '📟' : '💻');
+          const elapsedSec = Math.max(0, Math.round((Date.now() - dev.lastSeen) / 1000));
+          
+          let statusHtml = '';
+          if (dev.status === 'online') {
+            statusHtml = `<span class="device-status-pill online"><span class="pulse-dot"></span> Active Now (${elapsedSec}s ago)</span>`;
+          } else if (dev.status === 'idle') {
+            statusHtml = `<span class="device-status-pill idle">● Idle / Tab Away (${elapsedSec}s ago)</span>`;
+          } else {
+            statusHtml = `<span class="device-status-pill offline">○ Disconnected</span>`;
+          }
+
+          const badgeTag = dev.isCurrentDevice
+            ? `<span class="tag-this-device">This Device (Admin)</span>`
+            : `<span class="tag-remote-visitor">🟢 Live Remote Visitor</span>`;
+
+          card.innerHTML = `
+            <div class="device-card-header">
+              <div class="device-icon-box">${icon}</div>
+              <div class="device-title-wrap">
+                <div class="device-name">
+                  <span>${dev.device} • ${dev.os || 'System'}</span>
+                  ${badgeTag}
+                </div>
+                <div class="device-specs">
+                  ${dev.browser || 'Browser'} • ${dev.resolution || 'Screen'}
+                </div>
+              </div>
+              <div>${statusHtml}</div>
+            </div>
+
+            <div class="device-details-list">
+              <div class="device-detail-item">
+                <span class="detail-label">Current Page</span>
+                <span class="detail-val path">${dev.path || '/'}</span>
+              </div>
+              <div class="device-detail-item">
+                <span class="detail-label">Location</span>
+                <span class="detail-val">
+                  ${dev.flag || '🌐'} ${dev.city || 'Unknown'}${dev.country ? ', ' + dev.country : ''}
+                </span>
+              </div>
+              <div class="device-detail-item">
+                <span class="detail-label">IP Address</span>
+                <span class="detail-val ip" style="cursor: pointer;" onclick="copyText('${dev.ip}')" title="Click to copy IP">
+                  ${dev.ip || 'Detecting...'} 📋
+                </span>
+              </div>
+              <div class="device-detail-item">
+                <span class="detail-label">Network / ISP</span>
+                <span class="detail-val" style="font-size: 0.75rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${dev.network || ''}">
+                  ${dev.network || 'Broadband Network'}
+                </span>
+              </div>
+            </div>
+          `;
+
+          devicesContainer.appendChild(card);
+        });
+      }
+
+      function renderTableRows(logs, highlightId = null) {
         tbody.innerHTML = '';
 
         if (!logs || logs.length === 0) {
@@ -668,8 +1365,8 @@
                   <div class="empty-state-icon">📡</div>
                   <h4 class="empty-state-title">No visits recorded yet</h4>
                   <p class="empty-state-desc">
-                    Telemetry is actively listening. When someone visits the portfolio (locally or on Vercel),
-                    their real IP, ISP network, and device telemetry will automatically appear here.
+                    Telemetry is actively streaming. When anyone visits the portfolio on mobile or desktop,
+                    their genuine IP, network, and device telemetry will automatically appear here in real time.
                   </p>
                 </div>
               </td>
@@ -680,12 +1377,17 @@
 
         logs.forEach(log => {
           const tr = document.createElement('tr');
+          if (highlightId && (log.id === highlightId)) {
+            tr.className = 'flash-row';
+          }
+
           const timeFormatted = formatTime(log.timestamp);
+          const isDevOnline = activeDevices.has(log.deviceId) && activeDevices.get(log.deviceId).status === 'online';
 
           tr.innerHTML = `
             <td>
-              <span class="status-pill-online">
-                ● ${log.status === 'online' ? 'Active' : 'Logged'}
+              <span class="${isDevOnline ? 'status-pill-online' : 'stream-status-pill'}" style="font-size: 0.725rem;">
+                ● ${isDevOnline ? 'Active Now' : 'Logged'}
               </span>
             </td>
             <td style="font-size: 0.8125rem; color: var(--text-muted); white-space: nowrap;">
@@ -710,7 +1412,7 @@
             </td>
             <td>
               <div class="device-badge">
-                <span>${log.device === 'Mobile' ? '📱' : '💻'}</span>
+                <span>${log.device === 'Mobile' ? '📱' : (log.device === 'Tablet' ? '📟' : '💻')}</span>
                 <span>${log.os} • ${log.browser}</span>
               </div>
             </td>
@@ -743,20 +1445,32 @@
       searchInput.addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase();
         const logs = window.PortfolioAnalytics.logs.filter(l => {
-          return l.ip.toLowerCase().includes(q) ||
-                 l.city.toLowerCase().includes(q) ||
-                 l.country.toLowerCase().includes(q) ||
-                 l.network.toLowerCase().includes(q) ||
-                 l.os.toLowerCase().includes(q) ||
-                 l.browser.toLowerCase().includes(q);
+          return (l.ip && l.ip.toLowerCase().includes(q)) ||
+                 (l.city && l.city.toLowerCase().includes(q)) ||
+                 (l.country && l.country.toLowerCase().includes(q)) ||
+                 (l.network && l.network.toLowerCase().includes(q)) ||
+                 (l.os && l.os.toLowerCase().includes(q)) ||
+                 (l.browser && l.browser.toLowerCase().includes(q));
         });
         renderTableRows(logs);
       });
 
-      // Refresh real logs
-      btnRefresh.addEventListener('click', () => {
-        renderDashboard();
-        showToast('🔄 Real telemetry refreshed.');
+      // Ping all devices
+      btnPing.addEventListener('click', () => {
+        if (window.PortfolioAnalytics) {
+          window.PortfolioAnalytics.broadcastPing();
+          showToast('⚡ Ping request broadcast to all active devices!');
+        }
+      });
+
+      // Refresh / Sync real logs
+      btnRefresh.addEventListener('click', async () => {
+        if (window.PortfolioAnalytics) {
+          await window.PortfolioAnalytics.fetchRemoteLogs();
+          window.PortfolioAnalytics.broadcastPing();
+          renderDashboard();
+          showToast('🔄 Real telemetry & active devices synced.');
+        }
       });
 
       // Export CSV
@@ -780,14 +1494,26 @@
 
       // Clear Logs
       btnClear.addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear real audit logs?')) {
+        if (confirm('Are you sure you want to clear local audit logs?')) {
           window.PortfolioAnalytics.clearLogs();
           renderDashboard();
-          showToast('✓ Logs cleared.');
+          showToast('✓ Local logs cleared.');
         }
       });
 
+      // Copy Link Buttons
+      const handleCopyLink = () => {
+        const portfolioUrl = window.location.origin + window.location.pathname.replace('login.html', 'index.html').replace(/\/login\/?$/, '/');
+        navigator.clipboard.writeText(portfolioUrl).then(() => {
+          showToast(`📋 Copied URL: ${portfolioUrl} — Open this on your phone!`);
+        });
+      };
+
+      if (btnCopyLink) btnCopyLink.addEventListener('click', handleCopyLink);
+      if (btnCopyBanner) btnCopyBanner.addEventListener('click', handleCopyLink);
+
       window.copyText = function(text) {
+        if (!text) return;
         navigator.clipboard.writeText(text).then(() => {
           showToast(`✓ Copied IP: ${text}`);
         });
@@ -796,7 +1522,7 @@
       function showToast(msg) {
         toast.textContent = msg;
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2400);
+        setTimeout(() => toast.classList.remove('show'), 2800);
       }
     });
   </script>
